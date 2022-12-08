@@ -1,30 +1,33 @@
-import { describe, it, expect } from "vitest"
-import { flushPromises, mount } from "@vue/test-utils"
-import { defineComponent, h, Suspense } from "vue"
-import SuspenseExample from "../SuspenseExample.vue"
+import { describe, it, expect, vi } from "vitest";
+import { flushPromises, mount } from "@vue/test-utils";
+import { defineComponent, h, Suspense } from "vue";
+import SuspenseExample from "../SuspenseExample.vue";
 
 const mountSuspense = async (component, options) => {
+  vi.useFakeTimers();
+
   const c = defineComponent({
     render() {
       return h(Suspense, null, {
         default: h(component),
         fallback: h("div", "fallback"),
-      })
+      });
     },
-  })
+  });
 
-  const wrapper = mount(c, options)
+  const wrapper = mount(c, options);
 
-  await flushPromises()
+  vi.advanceTimersByTime(100)
+  await flushPromises();
 
-  return wrapper
-}
+  return wrapper;
+};
 
 describe("the-example", () => {
   it("is testable", async () => {
-    const wrapper = await mountSuspense(SuspenseExample)
+    const wrapper = await mountSuspense(SuspenseExample);
 
-    console.log(wrapper.html())
-    expect(wrapper.html()).toContain("suspended")
-  })
-})
+    console.log(wrapper.html());
+    expect(wrapper.html()).toContain("Suspended");
+  });
+});
